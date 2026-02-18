@@ -16,7 +16,20 @@
         <span>High Score: <strong id="highScore">0</strong></span>
       </section>
 
-      <canvas id="game" width="400" height="400" aria-label="Snake game canvas"></canvas>
+      <section class="game-layout">
+        <aside class="speed-menu" aria-label="Speed selector">
+          <h2>Speed</h2>
+          <div class="speed-options" id="speedMenu">
+            <button type="button" class="speed-option" data-speed="1">1</button>
+            <button type="button" class="speed-option" data-speed="2">2</button>
+            <button type="button" class="speed-option is-active" data-speed="3">3</button>
+            <button type="button" class="speed-option" data-speed="4">4</button>
+            <button type="button" class="speed-option" data-speed="5">5</button>
+          </div>
+        </aside>
+
+        <canvas id="game" width="400" height="400" aria-label="Snake game canvas"></canvas>
+      </section>
 
       <p id="message" class="message">Press any arrow key to start</p>
     </main>

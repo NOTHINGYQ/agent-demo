@@ -3,10 +3,17 @@ const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
 const highScoreEl = document.getElementById('highScore');
 const messageEl = document.getElementById('message');
+const speedMenuEl = document.getElementById('speedMenu');
 
 const GRID_SIZE = 20;
 const CELL_SIZE = canvas.width / GRID_SIZE;
-const TICK_MS = 120;
+const SPEED_LEVELS = {
+  1: 220,
+  2: 170,
+  3: 120,
+  4: 90,
+  5: 65,
+};
 
 let snake;
 let direction;
@@ -17,6 +24,8 @@ let running;
 let paused;
 let gameOver;
 let timer;
+let speedLevel = 3;
+let tickMs = SPEED_LEVELS[speedLevel];
 
 const HIGH_SCORE_KEY = 'snake_high_score';
 let highScore = Number(localStorage.getItem(HIGH_SCORE_KEY) || 0);
@@ -35,6 +44,32 @@ function spawnFood() {
     candidate = randomCell();
   }
   food = candidate;
+}
+
+function restartTimer() {
+  clearInterval(timer);
+  timer = setInterval(move, tickMs);
+}
+
+function updateSpeedUI() {
+  const buttons = speedMenuEl.querySelectorAll('.speed-option');
+  buttons.forEach((button) => {
+    const isActive = Number(button.dataset.speed) === speedLevel;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+}
+
+function setSpeed(level) {
+  if (!SPEED_LEVELS[level]) return;
+  speedLevel = level;
+  tickMs = SPEED_LEVELS[level];
+  updateSpeedUI();
+  restartTimer();
+
+  if (!gameOver && !paused) {
+    messageEl.textContent = `Speed set to ${level}`;
+  }
 }
 
 function reset() {
@@ -179,6 +214,12 @@ function togglePause() {
   draw();
 }
 
+speedMenuEl.addEventListener('click', (event) => {
+  const target = event.target.closest('.speed-option');
+  if (!target) return;
+  setSpeed(Number(target.dataset.speed));
+});
+
 window.addEventListener('keydown', (event) => {
   switch (event.key) {
     case 'ArrowUp':
@@ -213,7 +254,8 @@ window.addEventListener('keydown', (event) => {
 });
 
 reset();
-timer = setInterval(move, TICK_MS);
+updateSpeedUI();
+restartTimer();
 
 window.addEventListener('beforeunload', () => {
   clearInterval(timer);
